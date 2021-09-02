@@ -1,0 +1,55 @@
+create table Links
+(
+    link_id   INTEGER
+        constraint Links_pk
+            primary key autoincrement,
+    link_data VARCHAR(50)
+);
+
+create table Logins
+(
+    login_id INTEGER
+        constraint Logins_pk
+            primary key autoincrement,
+    login    VARCHAR(50)
+);
+
+create table Passwords
+(
+    password_id INTEGER
+        constraint Passwords_pk
+            primary key autoincrement,
+    password    VARCHAR(50)
+);
+
+CREATE TABLE Generals
+(
+	general_id INTEGER
+		constraint Generals_pk
+			primary key autoincrement,
+	login_fk INTEGER NOT NULL,
+	password_fk INT NOT NULL,
+	link_fk INT NOT NULL,
+	FOREIGN KEY (login_fk) REFERENCES Logins (login_id),
+	FOREIGN KEY (password_fk) REFERENCES Passwords (password_id),
+	FOREIGN KEY (link_fk) REFERENCES Links (link_id)
+);
+
+
+
+cur.execute("INSERT INTO Generals (login_fk, password_fk, link_fk) \
+                SELECT login_id,password_id,link_id FROM Logins,Passwords,Links \
+                ORDER BY \
+                    login_id DESC,\
+                    link_id DESC, \
+                    password_id DESC\
+                LIMIT(1);")
+
+
+DELETE link_data, password, login, link_fk, login_fk, password_fk
+FROM
+Links JOIN Generals ON link_id = link_fk,
+Passwords JOIN Generals ON password_id = password_fk,
+Logins JOIN Generals ON login_id = login_fk
+WHERE link_data = 'LINK111';
+
